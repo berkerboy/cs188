@@ -100,7 +100,7 @@ def retrace_path(parents, beginning, end, problem):
     return steps
 
 
-def abstractSearch(problem, structure):
+def abstractSearch(problem, S):
 
     """Runs search with fringe managed by a data structure of your choice.
 
@@ -110,13 +110,15 @@ def abstractSearch(problem, structure):
 
     """
 
-    S = structure()
-
     visited = util.Stack()  # Will store the visited states
     parents = {}  # Will store the parent states of visited states
 
     c = problem.getStartState()
-    S.push(c)  # Put our first state in the stack
+
+    # Populate the fringe
+    for successor in problem.getSuccessors(c):
+        S.push(successor)
+        parents[successor[0]] = c
 
     #  Whilst we still have unvisited states
     while S.isEmpty() is False:
@@ -131,11 +133,11 @@ def abstractSearch(problem, structure):
         # Put all of the adjacent states in the stack, if they're neww
         for successor in problem.getSuccessors(c):
             if successor[0] not in visited.list:
-                S.push(successor[0])
+                S.push(successor)
                 parents[successor[0]] = c
 
         # And generate a new unexplored state
-        c = S.pop()
+        c = S.pop()[0]
 
 
 def depthFirstSearch(problem):
@@ -156,7 +158,7 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
 
-    return abstractSearch(problem, util.Stack)
+    return abstractSearch(problem, util.Stack())
 
 
 def breadthFirstSearch(problem):
@@ -166,38 +168,16 @@ def breadthFirstSearch(problem):
     of data structure; here we use a queue, which is FIFO (First One
     In, First One Out)"""
 
-    return abstractSearch(problem, util.Queue)
+    return abstractSearch(problem, util.Queue())
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
-    S = util.PriorityQueue()
+    def getCost(state):
+        return state[2]
 
-    visited = util.Stack()  # Will store the visited states
-    parents = {}  # Will store the parent states of visited states
-
-    c = problem.getStartState()
-    S.push(c, 1)  # Put our first state in the stack, cost of zero
-
-    #  Whilst we still have unvisited states
-    while S.isEmpty() is False:
-
-        # Mark the current state as visited
-        visited.push(c)
-
-        # If this is actually a goal state, we need to reconstruct the path and return it
-        if problem.isGoalState(c):
-            return retrace_path(parents, c, problem.getStartState(), problem)
-
-        # Put all of the adjacent states in the stack, if they're new
-        for successor in problem.getSuccessors(c):
-            if successor[0] not in visited.list:
-                S.push(successor[0], successor[2])
-                parents[successor[0]] = c
-
-        # And generate a new unexplored state
-        c = S.pop()
+    return abstractSearch(problem, util.PriorityQueueWithFunction(getCost))
 
 
 def nullHeuristic(state, problem=None):
