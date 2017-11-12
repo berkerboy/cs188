@@ -100,25 +100,17 @@ def retrace_path(parents, beginning, end, problem):
     return steps
 
 
-def depthFirstSearch(problem):
+def abstractSearch(problem, structure):
+
+    """Runs search with fringe managed by a data structure of your choice.
+
+    If structure    = Stack ->  DFS
+                    = Queue -> BFS
+                    = Priority Queue -> UCS
+
     """
-    Search the deepest nodes in the search tree first.
 
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-
-    S = util.Stack()
+    S = structure()
 
     visited = util.Stack()  # Will store the visited states
     parents = {}  # Will store the parent states of visited states
@@ -146,6 +138,26 @@ def depthFirstSearch(problem):
         c = S.pop()
 
 
+def depthFirstSearch(problem):
+    """
+    Search the deepest nodes in the search tree first.
+
+    Your search algorithm needs to return a list of actions that reaches the
+    goal. Make sure to implement a graph search algorithm.
+
+    To get started, you might want to try some of these simple commands to
+    understand the search problem that is being passed in:
+
+    print "Start:", problem.getStartState()
+    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    """
+    print "Start:", problem.getStartState()
+    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+
+    return abstractSearch(problem, util.Stack)
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first.
@@ -154,33 +166,7 @@ def breadthFirstSearch(problem):
     of data structure; here we use a queue, which is FIFO (First One
     In, First One Out)"""
 
-    S = util.Queue()
-
-    visited = util.Queue()  # Will store the visited states
-    parents = {}  # Will store the parent states of visited states
-
-    c = problem.getStartState()
-    S.push(c)  # Put our first state in the stack
-
-    #  Whilst we still have unvisited states
-    while S.isEmpty() is False:
-
-        # Mark the current state as visited
-        visited.push(c)
-
-        # If this is actually a goal state, we need to reconstruct the path and return it
-        if problem.isGoalState(c):
-            return retrace_path(parents, c, problem.getStartState(), problem)
-
-        # Put all of the adjacent states in the stack, if they're neww
-        for successor in problem.getSuccessors(c):
-            if successor[0] not in visited.list:
-                S.push(successor[0])
-                parents[successor[0]] = c
-
-        # And generate a new unexplored state
-        c = S.pop()
-
+    return abstractSearch(problem, util.Queue)
 
 
 def uniformCostSearch(problem):
