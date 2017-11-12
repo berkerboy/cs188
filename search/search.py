@@ -171,8 +171,34 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    S = util.PriorityQueue()
+
+    visited = util.Stack()  # Will store the visited states
+    parents = {}  # Will store the parent states of visited states
+
+    c = problem.getStartState()
+    S.push(c, 1)  # Put our first state in the stack, cost of zero
+
+    #  Whilst we still have unvisited states
+    while S.isEmpty() is False:
+
+        # Mark the current state as visited
+        visited.push(c)
+
+        # If this is actually a goal state, we need to reconstruct the path and return it
+        if problem.isGoalState(c):
+            return retrace_path(parents, c, problem.getStartState(), problem)
+
+        # Put all of the adjacent states in the stack, if they're new
+        for successor in problem.getSuccessors(c):
+            if successor[0] not in visited.list:
+                S.push(successor[0], successor[2])
+                parents[successor[0]] = c
+
+        # And generate a new unexplored state
+        c = S.pop()
+
 
 def nullHeuristic(state, problem=None):
     """
